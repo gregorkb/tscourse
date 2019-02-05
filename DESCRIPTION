@@ -1,0 +1,10 @@
+Package: tscourse
+Type: Package
+Title: Contains several functions for time series analysis.
+Version: 1.0
+Date: 2019-02-05
+Author: Karl B. Gregory
+Maintainer: Karl B. Gregory <gregorkb@stat.sc.edu>
+Description: This is a package containing some very basic functions for analyzing time series data, with the purpose of presenting some time series algorithms and computations in a transparent way.  The package accompanies a course in time series, STAT 720, given at the University of South Carolina.  It is a work in progress.
+License: GPL-3
+RoxygenNote: 6.0.1
