@@ -43,7 +43,7 @@ sample.acf <- function(x,max.lag=12)
 #' @param X a vector containing time series data.
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
-#' @return a list containing the one-step-ahead predictions as well as the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}
+#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, and the MSPEs of the predictions.
 #' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction
 DL.1step <- function(X,gamma.0,gamma.n){
 
@@ -51,7 +51,8 @@ DL.1step <- function(X,gamma.0,gamma.n){
 	X.pred <- numeric(n+1)
 	X.pred[1] <- 0
 	alpha <- numeric(n)
-	v.kminus1 <- gamma.0
+	v <- numeric(n+1)
+	v[1] <- gamma.0
 	a.k <- gamma.n[1] / gamma.0
 	alpha[1] <- a.k
 		
@@ -59,15 +60,14 @@ DL.1step <- function(X,gamma.0,gamma.n){
 	{
 		
 		X.pred[k+1] <- sum( a.k * X[k:1] )
-		
-		v.k <- v.kminus1*(1 - a.k[k]^2)
+
+		v[k+1] <- v[k]*(1 - a.k[k]^2)		
 		a.kplus1 <- numeric(k+1)
 		
-		a.kplus1[k+1] <- ( gamma.n[k+1] - sum( gamma.n[k:1] * a.k ) ) / v.k
+		a.kplus1[k+1] <- ( gamma.n[k+1] - sum( gamma.n[k:1] * a.k ) ) / v[k+1]
 		a.kplus1[1:k] <- a.k - a.kplus1[k+1] * a.k[k:1]
 		
 		a.k <- a.kplus1	
-		v.kminus1 <- v.k
 		
 		alpha[k+1] <- a.kplus1[k+1]
 		
@@ -76,7 +76,8 @@ DL.1step <- function(X,gamma.0,gamma.n){
 	X.pred[n+1] <- sum( a.k * X[n:1] )
 
 	output <- list( X.pred = X.pred,
-                    alpha = alpha)
+                    alpha = alpha,
+                    v = v)
 					
 	return(output)
 	
