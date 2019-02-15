@@ -84,70 +84,73 @@ DL.1step <- function(X, gamma.0, gamma.n)
 #' @param X a vector containing time series data.
 #' @param h the number of steps ahead for which to make predictions.
 #' @param K the covariance matrix of the random variables X_1,\dots,X_{n+h}.
-#' @return a list containing the predicted values as well as the MSPEs of the predictions.
-#' This function performs the innovations algorithm for one-step-ahead prediction
+#' @return a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta} such that \code{Theta %*% (X - X.pred) = X.pred}.
+#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction
 innov.hstep<- function(X,h,K){
 	  
 	n <- length(X)
 	v <- numeric(n+h)
 	X.pred <- numeric(n+h)
-	Theta <- matrix(NA,n+h,n+h)
+	Theta <- matrix(0,n+h,n+h)
 
 	v[1] <- K[1,1]
 	X.pred[1] <- 0
 	
-	Theta[1,1] <-  K[2,1] / v[1]
-	v[2] <- K[2,2] - Theta[1,1]^2*v[1]
-	X.pred[2] <- Theta[1,1]*X[1]
+	Theta[1+1,1] <-  K[2,1] / v[1]
+	v[2] <- K[2,2] - Theta[1+1,1]^2*v[1]
+	X.pred[2] <- Theta[1+1,1]*X[1]
 	
-	if(n > 1)
+	for(k in 2:n)
 	{
 		
-		for(k in 2:n)
-		{
-			
-			Theta[k,k] <- K[k+1,1] / v[1]
-							
-			for(j in 1:(k-1))
-			{
-				
-				Theta[k,k-j] <- (K[k+1,j+1]-sum(Theta[j,j:1]*Theta[k,k:(k-j+1)]*v[1:j]))/v[j+1]
-					
-			}
-			
-			v[k+1] <- K[k+1,k+1] - sum( Theta[k,k:1]^2 * v[1:k] )
-			X.pred[k+1] <- sum( Theta[k,1:k] *(X[k:1] - X.pred[k:1]) )
-			
-		}
-	
-		if(h > 1)
-		{
-		
-			for(k in (n+1):(n+h-1))
-			{
-				
-				Theta[k,k] <- K[k+1,1] / v[1]
-				
-				for(j in 1:(k-1))
-				{
-					
-					Theta[k,k-j]<-(K[k+1,j+1]-sum(Theta[j,j:1]*Theta[k,k:(k-j+1)]*v[1:j]))/v[j+1]
+		Theta[1+k,k] <- K[k+1,1] / v[1]
 						
-				}
+		for(j in 1:(k-1))
+		{
 			
-				v[k+1] <- K[k+1,k+1] - sum( Theta[k,(k-n+1):k]^2 * v[n:1] )
-				X.pred[k+1] <- sum( Theta[k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )				
+			Theta[1+k,k-j] <- (K[k+1,j+1]-sum(Theta[1+j,j:1]*Theta[1+k,k:(k-j+1)]*v[1:j]))/v[j+1]
 				
-			}
-	
 		}
-
-	}
 		
+		v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,k:1]^2 * v[1:k] )
+		
+		X.pred[k+1] <- sum( Theta[1+k,1:k] *(X[k:1] - X.pred[k:1]) )
+		
+	}
+
+	
+	for(k in (n+1):(n+h-1))
+	{
+		
+		Theta[1+k,k] <- K[k+1,1] / v[1]
+		
+		for(j in 1:(k-1))
+		{
+			
+			Theta[1+k,k-j]<-(K[k+1,j+1]-sum(Theta[1+j,j:1]*Theta[1+k,k:(k-j+1)]*v[1:j]))/v[j+1]
+				
+		}
+	
+		v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,(k-n+1):k]^2 * v[n:1] )
+		
+		X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )	
+					
+	}
+
+
+	for( k in 1:(n+h-1))
+	{
+		
+		Theta[1+k,1:k] <- Theta[1+k,k:1] # switch order of indices for export
+		
+	}
+	
+	
 	output <- list( X.pred = X.pred,
-					v = v)
+					v = v,
+					Theta = Theta[1:n,1:n])
 					
 	return(output)
-	
+
 }
 
