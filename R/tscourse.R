@@ -43,44 +43,39 @@ sample.acf <- function(x,max.lag=12)
 #' @param X a vector containing time series data.
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
-#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, and the MSPEs of the predictions.
+#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi} for which \code{Phi%*%X} returns the predictions.
 #' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction
-DL.1step <- function(X,gamma.0,gamma.n){
-
-	n <- length(X)
-	X.pred <- numeric(n+1)
-	X.pred[1] <- 0
-	alpha <- numeric(n)
-	v <- numeric(n+1)
-	v[1] <- gamma.0
-	a.k <- gamma.n[1] / gamma.0
-	alpha[1] <- a.k
-		
-	for(k in 1:(n-1))
-	{
-		
-		X.pred[k+1] <- sum( a.k * X[k:1] )
-
-		v[k+1] <- v[k]*(1 - a.k[k]^2)		
-		a.kplus1 <- numeric(k+1)
-		
-		a.kplus1[k+1] <- ( gamma.n[k+1] - sum( gamma.n[k:1] * a.k ) ) / v[k+1]
-		a.kplus1[1:k] <- a.k - a.kplus1[k+1] * a.k[k:1]
-		
-		a.k <- a.kplus1	
-		
-		alpha[k+1] <- a.kplus1[k+1]
-		
-	}
+DL.1step <- function(X, gamma.0, gamma.n) 
+{
 	
-	X.pred[n+1] <- sum( a.k * X[n:1] )
+    n <- length(X)
+    alpha <- numeric(n)
+    v <- numeric(n + 1)
+    Phi <- matrix(0,n+1,n)
+    
+    v[1] <- gamma.0
+    Phi[2,1] <- gamma.n[1]/gamma.0
+    alpha[1] <- Phi[2,1]
+    
+    for (k in 1:(n - 1))
+    {
 
-	output <- list( X.pred = X.pred,
-                    alpha = alpha,
-                    v = v)
-					
-	return(output)
+        v[k + 1] <- v[k] * (1 - Phi[1+k,1]^2)
+        Phi[1+k+1,1] <- (gamma.n[k + 1] - sum(gamma.n[1:k] * Phi[1+k,1:k]))/v[k + 1]
+        Phi[1+k+1,(k+1):2]	<- Phi[1+k,k:1] - Phi[1+k+1,1] * Phi[1+k,1:k]
+        alpha[k + 1] <- Phi[1+k+1,1]
+
+    }
 	
+	X.pred <- as.numeric(Phi %*% X)
+
+    output <- list(	X.pred = X.pred, 
+    				alpha = alpha, 
+    				v = v, 
+    				Phi = Phi)
+
+    return(output)
+
 }
 
 
