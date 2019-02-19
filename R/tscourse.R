@@ -119,6 +119,7 @@ innov.hstep<- function(X,h,K){
 	}
 
 	if( h > 1)
+	{
 		
 		for(k in (n+1):(n+h-1))
 		{
