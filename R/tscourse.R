@@ -118,25 +118,27 @@ innov.hstep<- function(X,h,K){
 		
 	}
 
-	
-	for(k in (n+1):(n+h-1))
-	{
+	if( h > 1)
 		
-		Theta[1+k,k] <- K[k+1,1] / v[1]
-		
-		for(j in 1:(k-1))
+		for(k in (n+1):(n+h-1))
 		{
 			
-			Theta[1+k,k-j]<-(K[k+1,j+1]-sum(Theta[1+j,j:1]*Theta[1+k,k:(k-j+1)]*v[1:j]))/v[j+1]
+			Theta[1+k,k] <- K[k+1,1] / v[1]
+			
+			for(j in 1:(k-1))
+			{
 				
-		}
-	
-		v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,(k-n+1):k]^2 * v[n:1] )
-		
-		X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )	
+				Theta[1+k,k-j]<-(K[k+1,j+1]-sum(Theta[1+j,j:1]*Theta[1+k,k:(k-j+1)]*v[1:j]))/v[j+1]
 					
-	}
+			}
+		
+			v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,(k-n+1):k]^2 * v[n:1] )
+			
+			X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )	
+						
+		}
 
+	}
 
 	for( k in 1:(n+h-1))
 	{
