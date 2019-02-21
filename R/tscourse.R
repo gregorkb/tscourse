@@ -66,6 +66,8 @@ DL.1step <- function(X, gamma.0, gamma.n)
         alpha[k + 1] <- Phi[1+k+1,1]
 
     }
+    
+	v[n+1] <- v[n] * (1 - Phi[n+1,1]^2)
 	
 	X.pred <- as.numeric(Phi %*% X)
 
