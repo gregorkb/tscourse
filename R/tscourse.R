@@ -167,7 +167,7 @@ innov.hstep<- function(X,h,K){
 #' @param trun the number of terms to keep in the causal representation of the model
 #' @return a vector containing the first \code{trun+1} moving average coefficients in the causal representation of the ARMA(p,q) model
 #' This function recursively computes the coefficients in the MA(Inf) representation of the causal ARMA(p,q) model.
-ARMAtoMA <- function(phi,theta,trun)
+ARMAtoMAinf <- function(phi,theta,trun)
 {
   
   # check to see if the time series is causal:
@@ -220,7 +220,7 @@ get.ARMA.data <- function(phi,theta,sigma,n,trun=500)
 	if( minroot < 1)
 		stop("The ARMA process specified is not invertible.")
 	
-	psi <- ARMAtoMA(phi,theta,trun=trun)	
+	psi <- ARMAtoMAinf(phi,theta,trun=trun)	
 	
 	Z <- rnorm(n+trun,0,sigma)
 	X <- numeric(n)
@@ -251,7 +251,7 @@ ARMAacvf <- function(phi,theta,sigma,max.lag=12,trun=500)
 	if( minroot < 1)
 		stop("The ARMA process specified is not causal.")
 
-	psi <- ARMAtoMA(phi,theta,trun=trun)
+	psi <- ARMAtoMAinf(phi,theta,trun=trun)
 		
 	gamma.0 <- sigma^2 * sum(psi[1:(1+trun)]^2)
 	ARMAacvf <- numeric(max.lag+1)
