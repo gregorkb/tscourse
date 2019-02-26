@@ -159,3 +159,111 @@ innov.hstep<- function(X,h,K){
 
 }
 
+
+#' Gives coefficients of causal representation of a causal ARMA(p,q) model
+#'
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param trun the number of terms to keep in the causal representation of the model
+#' @return a vector containing the first \code{trun+1} moving average coefficients in the causal representation of the ARMA(p,q) model
+#' This function recursively computes the coefficients in the MA(Inf) representation of the causal ARMA(p,q) model.
+ARMAtoMA <- function(phi,theta,trun)
+{
+  
+  # check to see if the time series is causal:
+	minroot <- min(Mod(polyroot(c(1,-phi))))
+	if( minroot < 1)
+		stop("The ARMA process specified is not causal.")
+	
+	p <- length(phi)
+	q <- length(theta)
+	
+	# set theta_j = 0 for j > q
+	theta.0 <- c(theta,rep(0,trun-q))
+	
+	# set psi_j = 0 for j < 0
+	psi.0 <- numeric(trun+p)
+	psi.0[p] <- 1 # this is psi_0
+	
+	for(j in 1:trun)
+	{
+		
+		psi.0[p+j] <- theta.0[j] + sum( phi[1:p] * psi.0[(p+j-1):j] )
+		
+	}	
+	
+	# take away zeroes at beginning
+  psi <- psi.0[p:(p+trun)]
+		
+	return(psi)
+	
+}
+
+#' Generates data from an ARMA(p,q) model with iid Normal innovations.
+#'
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param sigma the white noise variance.
+#' @param n the length of the realization to be generated.
+#' @param trun the number of terms to keep in the causal representation of the model, which is used to generate the data.
+#' @return a length-\code{n} realization of the time series.
+#' This function generates a length-\code{n} realization from a causal invertible ARMA(p,q) model with iid Normal innovations.
+get.ARMA.data <- function(phi,theta,sigma,n,trun=500)
+{
+	
+	# check to see if the time series is causal:
+	minroot <- min(Mod(polyroot(c(1,-phi))))
+	if( minroot < 1)
+		stop("The ARMA process specified is not causal.")
+
+	minroot <- min(Mod(polyroot(c(1,theta))))
+	if( minroot < 1)
+		stop("The ARMA process specified is not invertible.")
+	
+	psi <- ARMAtoMA(phi,theta,trun=trun)	
+	
+	Z <- rnorm(n+trun,0,sigma)
+	X <- numeric(n)
+	
+	for( t in 1:n)
+	{
+		ind <- trun + t:(t-trun)
+		X[t] <- sum( psi * Z[ind] )
+	}
+
+	return(as.ts(X))
+
+}
+
+#' Computes the autocovariance function of a causal ARMA(p,q) process.
+#'
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param sigma the white noise variance.
+#' @param max.lag the number of lags at which to return the value of the autocovariance function.
+#' @param trun the order at which to truncate the MA(Inf) representation of the causal ARMA(p,q) process.
+#' @return A vector containing the values of the autocovariance function at lags \code{0} through \code{max.lag}.
+ARMAacvf <- function(phi,theta,sigma,max.lag=12,trun=500)
+{
+	
+	# check to see if the time series is causal:
+	minroot <- min(Mod(polyroot(c(1,-phi))))
+	if( minroot < 1)
+		stop("The ARMA process specified is not causal.")
+
+	psi <- ARMAtoMA(phi,theta,trun=trun)
+		
+	gamma.0 <- sigma^2 * sum(psi[1:(1+trun)]^2)
+	ARMAacvf <- numeric(max.lag+1)
+	ARMAacvf[1] <- gamma.0
+	
+	for(h in 1:max.lag)
+	{
+		
+		ARMAacvf[1+h] <- sigma^2 * sum( psi[1:(1+trun-h)] * psi[(1+h):(1+trun)])
+		
+	}
+	
+	return(ARMAacvf)
+	
+}
