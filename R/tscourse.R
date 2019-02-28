@@ -167,13 +167,16 @@ innov.hstep<- function(X,h,K){
 #' @param trun the number of terms to keep in the causal representation of the model
 #' @return a vector containing the first \code{trun+1} moving average coefficients in the causal representation of the ARMA(p,q) model
 #' This function recursively computes the coefficients in the MA(Inf) representation of the causal ARMA(p,q) model.
-ARMAtoMAinf <- function(phi,theta,trun)
+ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
 {
   
   # check to see if the time series is causal:
+  	if(length(phi)>0)
+  	{
 	minroot <- min(Mod(polyroot(c(1,-phi))))
 	if( minroot < 1)
 		stop("The ARMA process specified is not causal.")
+	}
 	
 	p <- length(phi)
 	q <- length(theta)
@@ -193,7 +196,7 @@ ARMAtoMAinf <- function(phi,theta,trun)
 	}	
 	
 	# take away zeroes at beginning
-  psi <- psi.0[p:(p+trun)]
+  	psi <- psi.0[p:(p+trun)]
 		
 	return(psi)
 	
@@ -208,19 +211,25 @@ ARMAtoMAinf <- function(phi,theta,trun)
 #' @param trun the number of terms to keep in the causal representation of the model, which is used to generate the data.
 #' @return a length-\code{n} realization of the time series.
 #' This function generates a length-\code{n} realization from a causal invertible ARMA(p,q) model with iid Normal innovations.
-get.ARMA.data <- function(phi,theta,sigma,n,trun=500)
+get.ARMA.data <- function(phi=NULL,theta=NULL,sigma=1,n,trun=500)
 {
 	
 	# check to see if the time series is causal:
+	if(length(phi) > 0)
+	{
 	minroot <- min(Mod(polyroot(c(1,-phi))))
 	if( minroot < 1)
 		stop("The ARMA process specified is not causal.")
-
+	}
+	# check to see if the time series is invertible
+	if(length(theta)>0)
+	{
 	minroot <- min(Mod(polyroot(c(1,theta))))
 	if( minroot < 1)
 		stop("The ARMA process specified is not invertible.")
+	}
 	
-	psi <- ARMAtoMAinf(phi,theta,trun=trun)	
+	psi <- ARMAtoMAinf(phi,theta,trun)	
 	
 	Z <- rnorm(n+trun,0,sigma)
 	X <- numeric(n)
@@ -243,15 +252,17 @@ get.ARMA.data <- function(phi,theta,sigma,n,trun=500)
 #' @param max.lag the number of lags at which to return the value of the autocovariance function.
 #' @param trun the order at which to truncate the MA(Inf) representation of the causal ARMA(p,q) process.
 #' @return A vector containing the values of the autocovariance function at lags \code{0} through \code{max.lag}.
-ARMAacvf <- function(phi,theta,sigma,max.lag=12,trun=500)
+ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 {
-	
 	# check to see if the time series is causal:
+	if(length(phi)>0)
+	{
 	minroot <- min(Mod(polyroot(c(1,-phi))))
 	if( minroot < 1)
 		stop("The ARMA process specified is not causal.")
-
-	psi <- ARMAtoMAinf(phi,theta,trun=trun)
+	}
+	
+	psi <- ARMAtoMAinf(phi,theta,trun)
 		
 	gamma.0 <- sigma^2 * sum(psi[1:(1+trun)]^2)
 	ARMAacvf <- numeric(max.lag+1)
