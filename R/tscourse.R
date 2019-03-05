@@ -171,33 +171,42 @@ ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
 {
   
   # check to see if the time series is causal:
-  	if(length(phi)>0)
+  
+  	if(length(phi)==0)
   	{
-	minroot <- min(Mod(polyroot(c(1,-phi))))
-	if( minroot < 1)
-		stop("The ARMA process specified is not causal.")
+  		q <- length(theta)	
+  		psi <- numeric(trun)
+  		psi[1:(q+1)] <- c(1,theta)
+  		
+  	} else if(length(phi)>0)
+  	{
+  		
+		minroot <- min(Mod(polyroot(c(1,-phi))))
+		if( minroot < 1)
+			stop("The ARMA process specified is not causal.")
+		
+		p <- length(phi)
+		q <- length(theta)
+		
+		# set theta_j = 0 for j > q
+		theta.0 <- c(theta,rep(0,trun-q))
+		
+		# set psi_j = 0 for j < 0
+		psi.0 <- numeric(trun+p)
+		psi.0[p] <- 1 # this is psi_0
+		
+		for(j in 1:trun)
+		{
+			
+			psi.0[p+j] <- theta.0[j] + sum( phi[1:p] * psi.0[(p+j-1):j] )
+			
+		}	
+		
+		# take away zeroes at beginning
+	  	psi <- psi.0[p:(p+trun)]
+	
 	}
 	
-	p <- length(phi)
-	q <- length(theta)
-	
-	# set theta_j = 0 for j > q
-	theta.0 <- c(theta,rep(0,trun-q))
-	
-	# set psi_j = 0 for j < 0
-	psi.0 <- numeric(trun+p)
-	psi.0[p] <- 1 # this is psi_0
-	
-	for(j in 1:trun)
-	{
-		
-		psi.0[p+j] <- theta.0[j] + sum( phi[1:p] * psi.0[(p+j-1):j] )
-		
-	}	
-	
-	# take away zeroes at beginning
-  	psi <- psi.0[p:(p+trun)]
-		
 	return(psi)
 	
 }
