@@ -4,7 +4,8 @@
 \alias{ARMAacvf}
 \title{Computes the autocovariance function of a causal ARMA(p,q) process.}
 \usage{
-ARMAacvf(phi, theta, sigma, max.lag = 12, trun = 500)
+ARMAacvf(phi = NULL, theta = NULL, sigma = 1, max.lag = 12,
+  trun = 500)
 }
 \arguments{
 \item{phi}{a vector with autoregressive coefficients.}

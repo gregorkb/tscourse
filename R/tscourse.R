@@ -169,9 +169,7 @@ innov.hstep<- function(X,h,K){
 #' This function recursively computes the coefficients in the MA(Inf) representation of the causal ARMA(p,q) model.
 ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
 {
-  
-  # check to see if the time series is causal:
-  
+   
   	if(length(phi)==0)
   	{
   		q <- length(theta)	
@@ -180,7 +178,7 @@ ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
   		
   	} else if(length(phi)>0)
   	{
-  		
+  		# check to see if the time series is causal:
 		minroot <- min(Mod(polyroot(c(1,-phi))))
 		if( minroot < 1)
 			stop("The ARMA process specified is not causal.")
@@ -287,3 +285,91 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 	return(ARMAacvf)
 	
 }
+
+#' Find the spectral density function of an ARMA(p,q) process
+#'
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param sigma the white noise variance.
+#' @param plot if \code{TRUE} the spectral density is plotted
+#' @return a list containing values of the spectral density function and the corresponding frequencies
+ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
+{
+
+	lambda <- seq(-pi,pi,by=2*pi/1e5)
+	
+	p <- length(phi)
+	q <- length(theta)
+	
+	theta.pol <- rep(1,length(lambda))
+	if(q > 0)
+	{
+		for(k in 1:q)
+		{
+			theta.pol <- theta.pol + theta[k] * exp(-1i*k*lambda)
+		}
+	}
+	
+	phi.pol <- rep(1,length(lambda))
+	if( p > 0)
+	{
+		for(k in 1:p)
+		{
+			phi.pol <- phi.pol - phi[k] * exp(-1i*k*lambda)
+		}
+	}
+	
+	f <- sigma^2/(2*pi) * Mod(theta.pol)^2/Mod(phi.pol)^2
+	
+	if(plot==TRUE)
+	{
+		plot(f[lambda>=0]~lambda[lambda>=0],type="l",ylab="spectral density",xlab="lambda")
+	}
+	
+	output <- list(	f = f,
+					lambda = lambda)
+					
+	return(output)
+	
+}
+
+
+#' Find the moving average representation of a time series based on the spectral density
+#'
+#' @param f a vector with evaluations of the spectral density
+#' @param lambda the frequencies to which the values of f correspond. Should be evenly spaced and dense between \code{-pi} and \code{pi}.
+#' @param trun the number of terms to keep in the moving average representation of the time series
+#' @param tol controls the accuracy. Smaller values require more computation time.
+#' @return a vector containing the coefficients of the moving average representation of the time series.
+#' This is based on the work of Pourahmadi (1984).
+#' @references Pourahmadi, M. (1984). Taylor expansion of and some applications. \emph{The American Mathematical Monthly}, 91(5), 303-307.
+SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
+{
+		
+	delta <- 2*pi/(length(lambda)-1) # assume equally spaced lambdas
+	a <- numeric(trun)
+	for(k in 1:trun)
+	{
+		# integrate over the log of the spectral density
+		a[k] <- 1/(2*pi) * sum( log(f) * exp(-1i*(k-1)*lambda)) * delta
+		
+		if(abs(a[k]) < tol) break
+		
+	}
+	
+	
+	c <- numeric(trun)
+	c[1] <- 1
+	for(k in 0:(trun-2))
+	{
+		
+		c[k+2] <- sum( (1 - c(0:k) / (k+1) ) * a[k:0 + 2] * c[0:k + 1] )
+		
+	}
+	
+	c <- ifelse(abs(Re(c)) > tol,Re(c),0)
+	
+	return(c)
+	
+}
+

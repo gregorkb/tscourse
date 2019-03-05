@@ -4,7 +4,7 @@
 \alias{ARMAtoMAinf}
 \title{Gives coefficients of causal representation of a causal ARMA(p,q) model}
 \usage{
-ARMAtoMAinf(phi, theta, trun)
+ARMAtoMAinf(phi = NULL, theta = NULL, trun = 500)
 }
 \arguments{
 \item{phi}{a vector with autoregressive coefficients.}

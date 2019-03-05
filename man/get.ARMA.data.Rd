@@ -4,7 +4,7 @@
 \alias{get.ARMA.data}
 \title{Generates data from an ARMA(p,q) model with iid Normal innovations.}
 \usage{
-get.ARMA.data(phi, theta, sigma, n, trun = 500)
+get.ARMA.data(phi = NULL, theta = NULL, sigma = 1, n, trun = 500)
 }
 \arguments{
 \item{phi}{a vector with autoregressive coefficients.}
