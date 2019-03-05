@@ -327,7 +327,7 @@ ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
 	}
 	
 	output <- list(	f = f,
-					lambda = lambda)
+			lambda = lambda)
 					
 	return(output)
 	
@@ -357,14 +357,13 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 		
 	}
 	
-	
 	c <- numeric(trun)
 	c[1] <- 1
 	for(k in 0:(trun-2))
 	{
 		
-		c[k+2] <- sum( (1 - c(0:k) / (k+1) ) * a[k:0 + 2] * c[0:k + 1] )
-		
+		c[k+2] <- sum( (1 - c(0:k) / (k+1) ) * a[k:0 + 2] * c[0:k + 1] )	
+	
 	}
 	
 	c <- ifelse(abs(Re(c)) > tol,Re(c),0)
