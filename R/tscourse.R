@@ -327,7 +327,7 @@ ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
 	}
 	
 	output <- list(	f = f,
-					lambda = lambda)
+			lambda = lambda)
 					
 	return(output)
 	
