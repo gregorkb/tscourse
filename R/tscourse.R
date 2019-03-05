@@ -43,7 +43,7 @@ sample.acf <- function(x,max.lag=12)
 #' @param X a vector containing time series data.
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
-#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi} for which \code{Phi%*%X} returns the predictions.
+#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi} for which \code{Phi %*% X} returns the predictions.
 #' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction
 DL.1step <- function(X, gamma.0, gamma.n) 
 {
@@ -369,6 +369,73 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	c <- ifelse(abs(Re(c)) > tol,Re(c),0)
 	
 	return(c)
+	
+}
+
+
+
+#' Evaluate the Parzen window
+#'
+#' @param x a real number.
+#' @return the value of the Parzen window function.
+parzen <- function(x)
+{
+	
+	if( abs(x) < 1/2){
+		
+		return( 1 - 6 * x^2 + 6 * abs(x)^3 )
+		
+	} else if( (abs(x) >= 1/2) & (abs(x) <= 1)){
+		
+		return( 2*(1 - abs(x))^3 )
+		
+	} else {
+		
+		return( 0 )
+		
+	}
+	
+}
+
+
+
+#' Compute a lag-windor estimator of the spectral density
+#'
+#' @param X a numeric vector containing the observed data
+#' @param L the number of lags at which to truncate the autocovariance function.
+#' @param window the lag window function to be used. Default is the Parzen window.
+#' @param nlambda the number of values between \code{-pi} and \code{pi} for which the estimate of the spectral density should be computed.
+#' @param plot if \code{TRUE} then a plot of the estimated spectral density is produced.
+#' @return a list containing values of the estimated spectral density function and the corresponding frequencies.
+SDlagWest <- function(X,L,window=parzen,nlambda=1e4,plot=TRUE)
+{
+	
+	lambda <- seq(-pi,pi,by=2*pi/nlambda)
+
+	gamma.hat.0toL <- sample.acf(X,max.lag = L)$gamma.hat
+	gamma.hat <- c(gamma.hat.0toL[(L+1):2],gamma.hat.0toL)
+	
+	E.lambda <- matrix(NA,2*L+1,length(lambda))
+	gamma.hat.weighted <- numeric(2*L+1)
+	for(j in (-L):L)
+	{
+		
+		E.lambda[j+L+1,] <- exp( -1i * j * lambda )
+		gamma.hat.weighted[j+L+1] <- window(abs(j/L)) * gamma.hat[j+L+1]
+		
+	}
+	
+	f.hat.L <- as.numeric( Re(t(Conj(E.lambda)) %*% gamma.hat.weighted )) / ( 2*pi )
+	
+	if(plot==TRUE)
+	{
+		plot(f.hat.L[lambda>=0]~lambda[lambda>=0],type="l",ylab="estimate of spectral density",xlab="lambda")
+	}
+	
+	output <- list( f.hat = f.hat,
+					lambda = lambda)
+					
+	return(output)
 	
 }
 
