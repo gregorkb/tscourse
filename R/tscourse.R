@@ -273,7 +273,7 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 	
 	psi <- ARMAtoMAinf(phi,theta,trun)
 		
-	gamma.0 <- sigma^2 * sum(psi[1:(1+trun)]^2)
+	gamma.0 <- sigma^2 * sum(psi^2)
 	ARMAacvf <- numeric(max.lag+1)
 	ARMAacvf[1] <- gamma.0
 	
