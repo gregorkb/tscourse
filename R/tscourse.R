@@ -80,7 +80,6 @@ DL.1step <- function(X, gamma.0, gamma.n)
 
 }
 
-
 #'Performs the innovations algorithm for h-step-ahead prediction.
 #'
 #' @param X a vector containing time series data.
@@ -150,7 +149,6 @@ innov.hstep<- function(X,h,K){
 		
 	}
 	
-	
 	output <- list( X.pred = X.pred,
 					v = v,
 					Theta = Theta[1:n,1:n])
@@ -158,7 +156,6 @@ innov.hstep<- function(X,h,K){
 	return(output)
 
 }
-
 
 #' Gives coefficients of causal representation of a causal ARMA(p,q) model
 #'
@@ -333,7 +330,6 @@ ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
 	
 }
 
-
 #' Find the moving average representation of a time series based on the spectral density
 #'
 #' @param f a vector with evaluations of the spectral density
@@ -372,8 +368,6 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	
 }
 
-
-
 #' Evaluate the Parzen window
 #'
 #' @param x a real number.
@@ -396,8 +390,6 @@ parzen <- function(x)
 	}
 	
 }
-
-
 
 #' Compute a lag-windor estimator of the spectral density
 #'
