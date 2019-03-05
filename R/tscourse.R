@@ -271,7 +271,7 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 	for(h in 1:max.lag)
 	{
 		
-		ARMAacvf[1+h] <- sigma^2 * sum( psi[1:(1+trun-h)] * psi[(1+h):(1+trun)])
+		ARMAacvf[1+h] <- sigma^2 * sum( psi[1:(trun-h)] * psi[(1+h):trun])
 		
 	}
 	
