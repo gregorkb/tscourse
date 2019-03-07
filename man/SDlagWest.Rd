@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{SDlagWest}
 \alias{SDlagWest}
-\title{Compute a lag-windor estimator of the spectral density}
+\title{Compute a lag-window estimator of the spectral density}
 \usage{
 SDlagWest(X, L, window = parzen, nlambda = 10000, plot = TRUE)
 }
@@ -21,5 +21,5 @@ SDlagWest(X, L, window = parzen, nlambda = 10000, plot = TRUE)
 a list containing values of the estimated spectral density function and the corresponding frequencies.
 }
 \description{
-Compute a lag-windor estimator of the spectral density
+Compute a lag-window estimator of the spectral density
 }

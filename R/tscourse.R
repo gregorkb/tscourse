@@ -368,6 +368,88 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	
 }
 
+#' Compute the periodogram
+#'
+#' @param X a vector of data
+#' @param plot if TRUE a plot of the periodogram is generated
+#' @return a list containing the periodogram ordinates, the Fourier frequencies, and the cumulative periodogram
+#'
+#' This function computes the periodogram at the Fourier frequencies.
+pgram <- function(X,plot=FALSE)
+{
+	
+	n <- length(X)
+	lambda <- (-floor((n-1)/2):floor(n/2))/n*2*pi
+	
+	E <- matrix(NA,n,n)
+	for(i in 1:n)
+	{
+		E[i,] <- 1/sqrt(n) * exp(1i*i*lambda)
+	}		
+	
+	# compute discrete Fourier transform of X		
+	D <- as.vector(t(Conj(E)) %*% X)
+	I <- Mod(D)^2
+	
+	if(plot == TRUE)
+	{
+		plot(I[lambda>0]~lambda[lambda>0],type="o")
+	}
+	
+	# compute cumulative periodogram	
+	Y0 <- cumsum(I[lambda < 0]) / sum(I[lambda < 0])
+	Y <- Y0[-length(Y0)]	
+
+	output <- list( I = I,
+					lambda = lambda,
+					Y = Y)
+	
+	return(output)
+	
+}
+
+
+#' Perform Bartlett's test for whether a time series is white noise
+#'
+#' @param X a vector containing time series data.
+#' @param plot if TRUE a plot of the cumulative periodogram is generated, on which the Kolmogorov-Smirnov bounds are displayed.
+#' @return the p value of Bartlett's test
+#'
+#' This function performs Bartlett's test for whether the time series is white noise.
+WNtest.Bartlett <- function(X,plot=FALSE)
+{
+	
+	Y <- pgram(X)$Y
+	q <- length(Y) + 1
+	
+	# compute test statistic
+	dev <-sqrt(q-1) * abs(Y - c(1:(q-1))/(q-1)) 
+	B <- max(dev)
+	
+	# get p-value
+	j <- c(-100:100)
+	pval <- 1 - sum( (-1)^j * exp(-2*B^2*j^2) )
+		
+	if(plot == TRUE)
+	{
+		plot(Y,
+				main=paste("Bartlett test: p val = ",round(pval,3),sep=""),
+				xlab="frequencies",
+				ylab="cumulative periodogram",
+				col = ifelse( dev > 1.36,"red","black" ),
+				pch = ifelse( dev > 1.36,19,1 ))
+		abline(-1.36/sqrt(q-1),1/(q-1))
+		abline(+1.36/sqrt(q-1),1/(q-1))
+		abline(-1.63/sqrt(q-1),1/(q-1),lty=3)
+		abline(+1.63/sqrt(q-1),1/(q-1),lty=3)
+
+	}
+	
+	return(pval)
+	
+}
+
+
 #' Evaluate the Parzen window
 #'
 #' @param x a real number.
@@ -391,7 +473,7 @@ parzen <- function(x)
 	
 }
 
-#' Compute a lag-windor estimator of the spectral density
+#' Compute a lag-window estimator of the spectral density
 #'
 #' @param X a numeric vector containing the observed data
 #' @param L the number of lags at which to truncate the autocovariance function.
