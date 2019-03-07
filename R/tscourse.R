@@ -170,7 +170,7 @@ ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
   	if(length(phi)==0)
   	{
   		q <- length(theta)	
-  		psi <- numeric(trun)
+  		psi <- numeric(trun+1)
   		psi[1:(q+1)] <- c(1,theta)
   		
   	} else if(length(phi)>0)
