@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{ARMAtoSD}
 \alias{ARMAtoSD}
-\title{Find the spectral density function of an ARMA(p,q) process}
+\title{Find the spectral density function of an ARMA(p,q) process.}
 \usage{
 ARMAtoSD(phi = NULL, theta = NULL, sigma, plot = TRUE)
 }
@@ -19,5 +19,5 @@ ARMAtoSD(phi = NULL, theta = NULL, sigma, plot = TRUE)
 a list containing values of the spectral density function and the corresponding frequencies
 }
 \description{
-Find the spectral density function of an ARMA(p,q) process
+Find the spectral density function of an ARMA(p,q) process.
 }

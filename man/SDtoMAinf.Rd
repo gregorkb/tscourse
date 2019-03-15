@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{SDtoMAinf}
 \alias{SDtoMAinf}
-\title{Find the moving average representation of a time series based on the spectral density}
+\title{Find the moving average representation of a time series based on the spectral density.}
 \usage{
 SDtoMAinf(f, lambda, trun = 500, tol = 1e-04)
 }
@@ -20,7 +20,7 @@ a vector containing the coefficients of the moving average representation of the
 This is based on the work of Pourahmadi (1984).
 }
 \description{
-Find the moving average representation of a time series based on the spectral density
+Find the moving average representation of a time series based on the spectral density.
 }
 \references{
 Pourahmadi, M. (1984). Taylor expansion of and some applications. \emph{The American Mathematical Monthly}, 91(5), 303-307.

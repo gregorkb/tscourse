@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{ARMAtoMAinf}
 \alias{ARMAtoMAinf}
-\title{Gives coefficients of causal representation of a causal ARMA(p,q) model}
+\title{Gives coefficients of causal representation of a causal ARMA(p,q) model.}
 \usage{
 ARMAtoMAinf(phi = NULL, theta = NULL, trun = 500)
 }
@@ -18,5 +18,5 @@ a vector containing the first \code{trun+1} moving average coefficients in the c
 This function recursively computes the coefficients in the MA(Inf) representation of the causal ARMA(p,q) model.
 }
 \description{
-Gives coefficients of causal representation of a causal ARMA(p,q) model
+Gives coefficients of causal representation of a causal ARMA(p,q) model.
 }

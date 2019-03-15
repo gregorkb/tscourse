@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{pgram}
 \alias{pgram}
-\title{Compute the periodogram}
+\title{Compute the periodogram.}
 \usage{
 pgram(X, plot = FALSE)
 }
@@ -17,5 +17,5 @@ a list containing the periodogram ordinates, the Fourier frequencies, and the cu
 This function computes the periodogram at the Fourier frequencies.
 }
 \description{
-Compute the periodogram
+Compute the periodogram.
 }

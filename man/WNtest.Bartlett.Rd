@@ -2,7 +2,7 @@
 % Please edit documentation in R/tscourse.R
 \name{WNtest.Bartlett}
 \alias{WNtest.Bartlett}
-\title{Perform Bartlett's test for whether a time series is white noise}
+\title{Perform Bartlett's test for whether a time series is iid Normal.}
 \usage{
 WNtest.Bartlett(X, plot = FALSE)
 }
@@ -14,8 +14,8 @@ WNtest.Bartlett(X, plot = FALSE)
 \value{
 the p value of Bartlett's test
 
-This function performs Bartlett's test for whether the time series is white noise.
+This function performs Bartlett's test for whether the time series is iid Normal.
 }
 \description{
-Perform Bartlett's test for whether a time series is white noise
+Perform Bartlett's test for whether a time series is iid Normal.
 }

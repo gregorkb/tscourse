@@ -157,7 +157,7 @@ innov.hstep<- function(X,h,K){
 
 }
 
-#' Gives coefficients of causal representation of a causal ARMA(p,q) model
+#' Gives coefficients of causal representation of a causal ARMA(p,q) model.
 #'
 #' @param phi a vector with autoregressive coefficients.
 #' @param theta a vector the moving average coefficients.
@@ -283,7 +283,7 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 	
 }
 
-#' Find the spectral density function of an ARMA(p,q) process
+#' Find the spectral density function of an ARMA(p,q) process.
 #'
 #' @param phi a vector with autoregressive coefficients.
 #' @param theta a vector the moving average coefficients.
@@ -330,7 +330,7 @@ ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
 	
 }
 
-#' Find the moving average representation of a time series based on the spectral density
+#' Find the moving average representation of a time series based on the spectral density.
 #'
 #' @param f a vector with evaluations of the spectral density
 #' @param lambda the frequencies to which the values of f correspond. Should be evenly spaced and dense between \code{-pi} and \code{pi}.
@@ -368,7 +368,7 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	
 }
 
-#' Compute the periodogram
+#' Compute the periodogram.
 #'
 #' @param X a vector of data
 #' @param plot if TRUE a plot of the periodogram is generated
@@ -409,13 +409,13 @@ pgram <- function(X,plot=FALSE)
 }
 
 
-#' Perform Bartlett's test for whether a time series is white noise
+#' Perform Bartlett's test for whether a time series is iid Normal.
 #'
 #' @param X a vector containing time series data.
 #' @param plot if TRUE a plot of the cumulative periodogram is generated, on which the Kolmogorov-Smirnov bounds are displayed.
 #' @return the p value of Bartlett's test
 #'
-#' This function performs Bartlett's test for whether the time series is white noise.
+#' This function performs Bartlett's test for whether the time series is iid Normal.
 WNtest.Bartlett <- function(X,plot=FALSE)
 {
 	
@@ -444,6 +444,32 @@ WNtest.Bartlett <- function(X,plot=FALSE)
 		abline(+1.63/sqrt(q-1),1/(q-1),lty=3)
 
 	}
+	
+	return(pval)
+	
+}
+
+#' Perform the Ljung-Box test for whether a time series is iid.
+#'
+#' @param X a vector containing time series data.
+#' @param k number of lags on which to base the test statistic
+#' @param nparms number of parameters in the fitted model; the degrees of freedom of the chi-squared distribution from which the p value is computed will be set equal to \code{k - nparms}.
+#' @return the p value of the Ljung-Box test
+#'
+#' This function performs the Ljung-Box test for whether the time series is iid.
+WNtest.LB <- function(X,k=1,nparms=0)
+{
+	
+	n <- length(X)
+	
+	if(k > n-1 ) 
+	  stop("k must be less than n")
+	if(k <= nparms)
+	  stop("k must be greater than nparms")
+	
+	rho.k <- sample.acf(X)$rho.hat[2:(k+1)]
+	Q.LB <- n*(n+2) * sum( rho.k^2 / (n - 1:k))
+	pval <- 1 - pchisq(Q.LB,k-nparms)
 	
 	return(pval)
 	
