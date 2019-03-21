@@ -44,11 +44,10 @@ sample.acf <- function(x,max.lag=12)
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
 #' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi}.
-#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
+#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. 
 DL.1step <- function(X, gamma.0, gamma.n) 
 {
 	
-	X.cent <- X - mean(X)
     n <- length(X)
     alpha <- numeric(n)
     v <- numeric(n + 1)
@@ -70,7 +69,7 @@ DL.1step <- function(X, gamma.0, gamma.n)
     
 	v[n+1] <- v[n] * (1 - Phi[n+1,1]^2)
 	
-	X.pred <- as.numeric(Phi %*% X.cent) + mean(X)
+	X.pred <- as.numeric(Phi %*% X)
 
     output <- list(	X.pred = X.pred, 
     					alpha = alpha, 
@@ -87,12 +86,9 @@ DL.1step <- function(X, gamma.0, gamma.n)
 #' @param h the number of steps ahead for which to make predictions.
 #' @param K the covariance matrix of the random variables X_1,\dots,X_{n+h}.
 #' @return a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta}.
-#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
+#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction.
 innov.hstep<- function(X,h,K){
-	
-	
-	X.cent <- X - mean(X) # center the data
-	
+		
 	n <- length(X)
 	v <- numeric(n+h)
 	X.pred <- numeric(n+h)
@@ -119,7 +115,7 @@ innov.hstep<- function(X,h,K){
 		
 		v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,k:1]^2 * v[1:k] )
 		
-		X.pred[k+1] <- sum( Theta[1+k,1:k] *(X.cent[k:1] - X.pred[k:1]) )
+		X.pred[k+1] <- sum( Theta[1+k,1:k] *(X[k:1] - X.pred[k:1]) )
 		
 	}
 
@@ -140,7 +136,7 @@ innov.hstep<- function(X,h,K){
 		
 			v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,(k-n+1):k]^2 * v[n:1] )
 			
-			X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X.cent[n:1] - X.pred[n:1]) )	
+			X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )	
 						
 		}
 
@@ -152,9 +148,7 @@ innov.hstep<- function(X,h,K){
 		Theta[1+k,1:k] <- Theta[1+k,k:1] # switch order of indices for export
 		
 	}
-	
-	X.pred <- X.pred + mean(X) # add mean back to predicted values.
-	
+		
 	output <- list( X.pred = X.pred,
 					v = v,
 					Theta = Theta[1:n,1:n])
