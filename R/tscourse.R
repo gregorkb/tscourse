@@ -290,6 +290,45 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 	
 }
 
+#' Computes h-step-ahead predictions from an ARMA(p,q) model
+#'
+#' @param X a vector containing time series data.
+#' @param h the number of steps ahead for which to make predictions.
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param sigma the white noise variance.
+#' @return a list containing the predicted values as well as the MSPEs of the predictions.
+#' This function builds a matrix of autocovariances for the ARMA(p,q) model using the MA(inf) representation of the process. It then runs the innovations algorithm on this matrix of autocovariances.
+ARMA.hstep <- function(X,h,phi,theta,sigma)
+{
+	
+	n <- length(X)
+	gamma.hat <- ARMAacvf(phi,theta,sigma,max.lag=n+h)
+	gamma.0 <- gamma.hat[1]
+	gamma.n <- gamma.hat[-1]
+	
+	K <- matrix(NA,n+h,n+h)
+	for(j in 1:(n+h))
+		for(i in 1:(n+h))
+		{
+			
+			K[i,j] <- c(gamma.0,gamma.n)[1+abs(i-j)]
+			
+		}
+	
+	innov.hstep.out <- innov.hstep(X,h,K)
+	X.pred <- innov.hstep.out$X.pred
+	v <- innov.hstep.out$v
+	
+	output <- list(	X.pred = X.pred,
+					v = v)
+					
+	return(output)
+	
+}
+
+
+
 #' Find the spectral density function of an ARMA(p,q) process.
 #'
 #' @param phi a vector with autoregressive coefficients.
