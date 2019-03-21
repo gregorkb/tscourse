@@ -19,6 +19,7 @@ get.ARMA.data(phi = NULL, theta = NULL, sigma = 1, n, trun = 500)
 }
 \value{
 a length-\code{n} realization of the time series.
+
 This function generates a length-\code{n} realization from a causal invertible ARMA(p,q) model with iid Normal innovations.
 }
 \description{

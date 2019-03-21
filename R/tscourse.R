@@ -2,7 +2,7 @@
 #'
 #' @param x a vector containing time series data.
 #' @param max.lag the largest lag at which to compute the autocovariance and autocorrelation functions.
-#' @return a list containing the autocovariance at lags zero through \code{max.lag}
+#' @return a list containing the autocovariance at lags zero through \code{max.lag}.
 #' This function computes the sample autocovariance and autocorrelation functions based on the input data.
 sample.acf <- function(x,max.lag=12)
 {
@@ -43,8 +43,8 @@ sample.acf <- function(x,max.lag=12)
 #' @param X a vector containing time series data.
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
-#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi} for which \code{Phi %*% X} returns the predictions.
-#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. Data are centered and then the mean is added to the predicted values of the centered time series.
+#' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi}.
+#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
 DL.1step <- function(X, gamma.0, gamma.n) 
 {
 	
@@ -86,8 +86,8 @@ DL.1step <- function(X, gamma.0, gamma.n)
 #' @param X a vector containing time series data.
 #' @param h the number of steps ahead for which to make predictions.
 #' @param K the covariance matrix of the random variables X_1,\dots,X_{n+h}.
-#' @return a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta} such that \code{Theta %*% (X - X.pred) = X.pred}.
-#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction. Data are centered and then the mean is added to the predicted values of the centered time series.
+#' @return a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta}.
+#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
 innov.hstep<- function(X,h,K){
 	
 	
@@ -220,6 +220,7 @@ ARMAtoMAinf <- function(phi=NULL,theta=NULL,trun=500)
 #' @param n the length of the realization to be generated.
 #' @param trun the number of terms to keep in the causal representation of the model, which is used to generate the data.
 #' @return a length-\code{n} realization of the time series.
+#'
 #' This function generates a length-\code{n} realization from a causal invertible ARMA(p,q) model with iid Normal innovations.
 get.ARMA.data <- function(phi=NULL,theta=NULL,sigma=1,n,trun=500)
 {

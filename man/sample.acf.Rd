@@ -12,7 +12,7 @@ sample.acf(x, max.lag = 12)
 \item{max.lag}{the largest lag at which to compute the autocovariance and autocorrelation functions.}
 }
 \value{
-a list containing the autocovariance at lags zero through \code{max.lag}
+a list containing the autocovariance at lags zero through \code{max.lag}.
 This function computes the sample autocovariance and autocorrelation functions based on the input data.
 }
 \description{

@@ -13,6 +13,10 @@ innov.hstep(X, h, K)
 
 \item{K}{the covariance matrix of the random variables X_1,\dots,X_{n+h}.}
 }
+\value{
+a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta}.
+This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
+}
 \description{
 Performs the innovations algorithm for h-step-ahead prediction.
 }

@@ -13,6 +13,10 @@ DL.1step(X, gamma.0, gamma.n)
 
 \item{gamma.n}{a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}}
 }
+\value{
+a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi}.
+This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. Data are centered and then the mean is added back to the predictions based on the centered time series.
+}
 \description{
 Performs the Durbin-Levinson algorithm for one-step-ahead prediction.
 }
