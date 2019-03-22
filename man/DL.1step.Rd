@@ -15,7 +15,7 @@ DL.1step(X, gamma.0, gamma.n)
 }
 \value{
 a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi}.
-This function performs the Durbin-Levinson algorithm for one-step-ahead prediction.
+This function performs the Durbin-Levinson algorithm for one-step-ahead prediction.  Data are centered before the prediction are computed and then mean is added back to the predictions.
 }
 \description{
 Performs the Durbin-Levinson algorithm for one-step-ahead prediction.

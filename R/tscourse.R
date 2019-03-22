@@ -44,9 +44,11 @@ sample.acf <- function(x,max.lag=12)
 #' @param gamma.0 the value of the autocovariance function at lag zero
 #' @param gamma.n a vector containing the values of the autocovariance function at lags \code{1} through \code{length(X)}
 #' @return a list containing the one-step-ahead predictions,the values of the partial autocorrelation function at lags \code{1} through \code{length(X)}, the MSPEs of the predictions, and the matrix \code{Phi}.
-#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction. 
+#' This function performs the Durbin-Levinson algorithm for one-step-ahead prediction.  Data are centered before the prediction are computed and then mean is added back to the predictions. 
 DL.1step <- function(X, gamma.0, gamma.n) 
 {
+	
+	X.cent <- X - mean(X)
 	
     n <- length(X)
     alpha <- numeric(n)
@@ -69,7 +71,7 @@ DL.1step <- function(X, gamma.0, gamma.n)
     
 	v[n+1] <- v[n] * (1 - Phi[n+1,1]^2)
 	
-	X.pred <- as.numeric(Phi %*% X)
+	X.pred <- as.numeric(Phi %*% X.cent) + mean(X)
 
     output <- list(	X.pred = X.pred, 
     					alpha = alpha, 
@@ -86,9 +88,11 @@ DL.1step <- function(X, gamma.0, gamma.n)
 #' @param h the number of steps ahead for which to make predictions.
 #' @param K the covariance matrix of the random variables X_1,\dots,X_{n+h}.
 #' @return a list containing the predicted values as well as the MSPEs of the predictions and the matrix \code{Theta}.
-#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction.
+#' This function performs the innovations algorithm for one-step-ahead and h-step-ahead prediction. Data are centered before the prediction are computed and then mean is added back to the predictions. 
 innov.hstep<- function(X,h,K){
 		
+		
+	X.cent <- X - mean(X)	
 	n <- length(X)
 	v <- numeric(n+h)
 	X.pred <- numeric(n+h)
@@ -115,7 +119,7 @@ innov.hstep<- function(X,h,K){
 		
 		v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,k:1]^2 * v[1:k] )
 		
-		X.pred[k+1] <- sum( Theta[1+k,1:k] *(X[k:1] - X.pred[k:1]) )
+		X.pred[k+1] <- sum( Theta[1+k,1:k] *(X.cent[k:1] - X.pred[k:1]) )
 		
 	}
 
@@ -136,7 +140,7 @@ innov.hstep<- function(X,h,K){
 		
 			v[k+1] <- K[k+1,k+1] - sum( Theta[1+k,(k-n+1):k]^2 * v[n:1] )
 			
-			X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X[n:1] - X.pred[n:1]) )	
+			X.pred[k+1] <- sum( Theta[1+k,(k-n+1):k] *(X.cent[n:1] - X.pred[n:1]) )	
 						
 		}
 
@@ -149,6 +153,9 @@ innov.hstep<- function(X,h,K){
 		
 	}
 		
+		
+	X.pred <- X.pred + mean(X)	 # add mean back to predictions
+	
 	output <- list( X.pred = X.pred,
 					v = v,
 					Theta = Theta[1:n,1:n])
@@ -291,11 +298,12 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 #' @param phi a vector with autoregressive coefficients.
 #' @param theta a vector the moving average coefficients.
 #' @param sigma the white noise variance.
-#' @return a list containing the predicted values as well as the MSPEs of the predictions.
+#' @return a list containing the predicted values as well as the MSPEs of the predictions and the AIC.
 #' This function builds a matrix of autocovariances for the ARMA(p,q) model using the MA(inf) representation of the process. It then runs the innovations algorithm on this matrix of autocovariances.
 ARMA.hstep <- function(X,h,phi,theta,sigma)
 {
 	
+	X.cent <- X - mean(X)
 	n <- length(X)
 	gamma.hat <- ARMAacvf(phi,theta,sigma,max.lag=n+h)
 	gamma.0 <- gamma.hat[1]
@@ -310,12 +318,18 @@ ARMA.hstep <- function(X,h,phi,theta,sigma)
 			
 		}
 	
-	innov.hstep.out <- innov.hstep(X,h,K)
-	X.pred <- innov.hstep.out$X.pred
+	innov.hstep.out <- innov.hstep(X,h,K) # this part is inefficient. Speed up someday with 5.3.9 of B&D Theory
+	X.pred <- innov.hstep.out$X.pred + mean(X)
 	v <- innov.hstep.out$v
 	
+	p <- length(phi)
+	q <- length(theta)
+	ll <- -(n/2)*log(2*pi) - (1/2) * sum( log( v )) - (1/2) * sum( (X - X.pred)^2/v)
+	aic <- -2*ll + 2 * ( p + q + 1 ) # plus 1 for the variance 
+		
 	output <- list(	X.pred = X.pred,
-					v = v)
+					v = v,
+					aic = aic)
 					
 	return(output)
 	
