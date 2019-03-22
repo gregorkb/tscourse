@@ -309,16 +309,18 @@ ARMA.hstep <- function(X,h,phi,theta,sigma)
 	gamma.0 <- gamma.hat[1]
 	gamma.n <- gamma.hat[-1]
 	
-	K <- matrix(NA,n+h,n+h)
-	for(j in 1:(n+h))
-		for(i in 1:(n+h))
+	K <- matrix(0,n+h,n+h)
+	for(j in 1:(n+h-1))
+		for(i in (j+1):(n+h))
 		{
 			
 			K[i,j] <- c(gamma.0,gamma.n)[1+abs(i-j)]
 			
 		}
 	
-	innov.hstep.out <- innov.hstep(X,h,K) # this part is inefficient. Speed up someday with 5.3.9 of B&D Theory
+	K <- K + t(K) + diag(rep(gamma.0),n+h)
+	
+	innov.hstep.out <- innov.hstep(X.cent,h,K) # this part is inefficient. Speed up someday with 5.3.9 of B&D Theory
 	X.pred <- innov.hstep.out$X.pred + mean(X)
 	v <- innov.hstep.out$v
 	
