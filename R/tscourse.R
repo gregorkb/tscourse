@@ -324,7 +324,7 @@ ARMA.hstep <- function(X,h,phi,theta,sigma)
 	
 	p <- length(phi)
 	q <- length(theta)
-	ll <- -(n/2)*log(2*pi) - (1/2) * sum( log( v )) - (1/2) * sum( (X - X.pred)^2/v)
+	ll <- -(n/2)*log(2*pi) - (1/2) * sum( log( v[1:n] )) - (1/2) * sum( (X - X.pred[1:n])^2/v)
 	aic <- -2*ll + 2 * ( p + q + 1 ) # plus 1 for the variance 
 		
 	output <- list(	X.pred = X.pred,
