@@ -18,7 +18,7 @@ ARMA.hstep(X, h, phi, theta, sigma)
 \item{sigma}{the white noise variance.}
 }
 \value{
-a list containing the predicted values as well as the MSPEs of the predictions and the AIC.
+a list containing the predicted values as well as the MSPEs of the predictions and the AIC and BIC.
 This function builds a matrix of autocovariances for the ARMA(p,q) model using the MA(inf) representation of the process. It then runs the innovations algorithm on this matrix of autocovariances.
 }
 \description{

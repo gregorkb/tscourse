@@ -298,7 +298,7 @@ ARMAacvf <- function(phi=NULL,theta=NULL,sigma=1,max.lag=12,trun=500)
 #' @param phi a vector with autoregressive coefficients.
 #' @param theta a vector the moving average coefficients.
 #' @param sigma the white noise variance.
-#' @return a list containing the predicted values as well as the MSPEs of the predictions and the AIC.
+#' @return a list containing the predicted values as well as the MSPEs of the predictions and the AIC and BIC.
 #' This function builds a matrix of autocovariances for the ARMA(p,q) model using the MA(inf) representation of the process. It then runs the innovations algorithm on this matrix of autocovariances.
 ARMA.hstep <- function(X,h,phi,theta,sigma)
 {
@@ -328,10 +328,12 @@ ARMA.hstep <- function(X,h,phi,theta,sigma)
 	q <- length(theta)
 	ll <- -(n/2)*log(2*pi) - (1/2) * sum( log( v[1:n] )) - (1/2) * sum( (X - X.pred[1:n])^2/v[1:n])
 	aic <- -2*ll + 2 * ( p + q + 1 ) # plus 1 for the variance 
+	bic <- -2*ll + log(n) * ( p + q + 1 )
 		
 	output <- list(	X.pred = X.pred,
 					v = v,
-					aic = aic)
+					aic = aic,
+					bic = bic)
 					
 	return(output)
 	
