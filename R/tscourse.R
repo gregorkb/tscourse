@@ -533,6 +533,62 @@ WNtest.LB <- function(X,k=1,nparms=0)
 	
 }
 
+#' Perform the Dickey-Fuller unit-root test
+#'
+#' @param X a vector containing time series data.
+#' @param p the autoregressive order on which to base the test.
+#' @return a list with logicals indicating rejection or failure to reject at the 0.05 and 0.01 significance levels as well as the value of the Dickey-Fuller test statistic.
+#'
+#' This function performs the Dickey-Fuller unit-root test.
+unitroottest.DF <- function(X,p=1)
+{
+	
+	if(p==1)
+	{
+		
+		Xdiff <- diff(X)
+		Xlag <- X[1:(n-1)]
+		lm.out <- lm(Xdiff ~ Xlag)
+		DF <- summary(lm.out)$coef[2,3]
+		
+	} else if(p > 1){
+		
+    Xdiff <- diff(X)
+	  
+    XX <- matrix(NA,n-p,p)
+    XX[,1] <- X[p:(n-1)]
+	  
+    for(j in 1:(p-1))
+	  {
+	    
+	    XX[,1+j] <- Xdiff[(p-j):(n-1-j)]
+	    
+	  }
+	 
+	  lm.out <- lm(Xdiff[p:(n-1)] ~ XX)
+		DF <- summary(lm.out)$coef[2,3]
+	  	
+	}
+	
+	reject.01 <- FALSE
+	reject.05 <- FALSE
+	if(DF < -3.43)
+	{
+		reject.01 <- TRUE
+	}
+	if(DF < -2.86)
+	{
+		reject.05 <- TRUE
+		
+	}
+	
+	output <- list( reject.05 = reject.05,
+					        reject.01 = reject.01,
+					        DF = DF)
+					
+	return(output)
+	
+}
 
 #' Evaluate the Parzen window
 #'
