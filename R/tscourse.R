@@ -340,6 +340,78 @@ ARMA.hstep <- function(X,h,phi,theta,sigma)
 }
 
 
+#' Predicts missing values of a time series based on an ARMA model
+#'
+#' @param X a vector containing time series data with missing values.
+#' @param phi a vector with autoregressive coefficients.
+#' @param theta a vector the moving average coefficients.
+#' @param sigma the white noise variance.
+#' @plot if TRUE, a plot is produced showing prediction intervals for the missing values.
+#' @return a list containing the predicted values of the time series, upper and lower bounds for the 95% prediction intervals, and sets of indices corresponding to missing and non-missing observations.
+#' This function predicts or imputes missing values in a time series by constructing an autocovariance function out of given ARMA parameters.  One should find estimated for the ARMA parameters based on the observed data using the \code{arima()} function and then feed these into this function to get the predictions for the missing values.
+ARMAimpute <- function(X,phi,theta,sigma,plot=TRUE)
+{
+	
+	n <- length(X)
+	X.bar <- mean(X,na.rm=TRUE)
+	X.cent <- X - X.bar
+
+	M <- which(is.na(X))
+	O <- c(1:n)[-M]
+	
+	g.hat <- ARMAacvf(phi,theta,sigma,max.lag=n-1)
+	G.hat <- matrix(NA,n,n)
+	for(i in 1:n)
+		for(j in 1:n)
+		{
+			
+			G.hat[i,j] <- g.hat[1 + abs(i-j)]
+			
+		}
+	
+	G.hat.O <- G.hat[O,O]
+	
+	X.pred <- X
+	v.pred <- lo.pred <- up.pred <- as.numeric(X)
+	
+	for(i in 1:length(M))
+	{
+		
+		g.hat.i.O <- G.hat[O,M[i]]
+		G.hat.0.inv <- solve(G.hat.O)
+		a.i <- G.hat.0.inv %*% g.hat.i.O
+		X.pred[M[i]] <- sum( a.i * X.cent[O]) + X.bar
+		v.pred[M[i]] <- G.hat[1,1] - t(g.hat.i.O) %*% G.hat.0.inv %*% g.hat.i.O
+		lo.pred[M[i]] <- X.pred[M[i]] - 1.96 * sqrt(v.pred[M[i]])
+		up.pred[M[i]] <- X.pred[M[i]] + 1.96 * sqrt(v.pred[M[i]])
+	
+	}
+	
+	if(plot==TRUE)
+	{
+		
+		plot(X.pred,ylim=range(up.pred,lo.pred,X.pred))
+		points(X.pred,type="p",pch=19,cex=.7,col=ifelse(1:n %in% O,"black","red"))
+		for(i in 1:length(M))
+		{
+			y.poly <- c(lo.pred[M[i]],lo.pred[M[i]],up.pred[M[i]],up.pred[M[i]])
+			x.poly <- c(M[i]-1/2,M[i]+1/2,M[i]+1/2,M[i]-1/2)
+			polygon(x=x.poly,y=y.poly,col=rgb(1,0,0,.5),border=NA)
+			
+		}
+		
+		abline(	h=X.bar,lty=3)		
+		
+	}
+
+	
+	output <- list(X.pred = X.pred,
+				   lo.pred = lo.pred,
+				   up.pred = up.pred,
+				   M = M,
+				   O = O)
+		
+}
 
 #' Find the spectral density function of an ARMA(p,q) process.
 #'
