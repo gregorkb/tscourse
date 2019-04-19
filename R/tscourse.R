@@ -718,7 +718,7 @@ SDlagWest <- function(X,L,window=parzen,nlambda=1e4,plot=TRUE)
 		plot(f.hat.L[lambda>=0]~lambda[lambda>=0],type="l",ylab="estimate of spectral density",xlab="lambda")
 	}
 	
-	output <- list( f.hat = f.hat,
+	output <- list( f.hat.L = f.hat.L,
 					lambda = lambda)
 					
 	return(output)
