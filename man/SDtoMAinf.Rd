@@ -16,7 +16,7 @@ SDtoMAinf(f, lambda, trun = 500, tol = 1e-04)
 \item{tol}{controls the accuracy. Smaller values require more computation time.}
 }
 \value{
-a vector containing the coefficients of the moving average representation of the time series.
+a list containing a vector containing the coefficients of the moving average representation of the time series as well as the standard deviation of the white noise in the MA-infinity representation.
 This is based on the work of Pourahmadi (1984).
 }
 \description{

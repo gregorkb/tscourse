@@ -466,7 +466,7 @@ ARMAtoSD <- function(phi=NULL,theta=NULL,sigma,plot=TRUE)
 #' @param lambda the frequencies to which the values of f correspond. Should be evenly spaced and dense between \code{-pi} and \code{pi}.
 #' @param trun the number of terms to keep in the moving average representation of the time series
 #' @param tol controls the accuracy. Smaller values require more computation time.
-#' @return a vector containing the coefficients of the moving average representation of the time series.
+#' @return a list containing a vector containing the coefficients of the moving average representation of the time series as well as the standard deviation of the white noise in the MA-infinity representation.
 #' This is based on the work of Pourahmadi (1984).
 #' @references Pourahmadi, M. (1984). Taylor expansion of and some applications. \emph{The American Mathematical Monthly}, 91(5), 303-307.
 SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
@@ -494,7 +494,12 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	
 	c <- ifelse(abs(Re(c)) > tol,Re(c),0)
 	
-	return(c)
+	sigma <- exp(a[1]/2)/sqrt(2*pi)
+	
+	output <- list( c = c,
+					sigma = sigma)
+	
+	return(output)
 	
 }
 
