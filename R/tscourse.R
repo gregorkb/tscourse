@@ -494,7 +494,7 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 	
 	c <- ifelse(abs(Re(c)) > tol,Re(c),0)
 	
-	sigma <- exp(a[1]/2)/sqrt(2*pi)
+	sigma <- exp(a[1]/2)*sqrt(2*pi)
 	
 	output <- list( c = c,
 					sigma = sigma)
