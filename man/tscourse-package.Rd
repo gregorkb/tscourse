@@ -13,7 +13,7 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{tscourse}
 \packageIndices{tscourse}
-~~ An overview of how to use the package, including the most important functions ~~
+This package provides basic functions for a graduate-level time series course I taught during the Spring semester of 2019.
 }
 \author{
 \packageAuthor{tscourse}
@@ -23,8 +23,7 @@ Maintainer: \packageMaintainer{tscourse}
 \references{
 ~~ Literature or other references for background information ~~
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
-~~ directory ~~
+
 \keyword{ package }
 \seealso{
 ~~ Optional links to other man pages, e.g. ~~
