@@ -510,8 +510,7 @@ SDtoMAinf <- function(f,lambda,trun=500,tol=1e-4)
 #' @return a list containing the periodogram ordinates, the Fourier frequencies, and the cumulative periodogram
 #'
 #' This function computes the periodogram at the Fourier frequencies.
-pgram <- function(X,plot=FALSE)
-{
+pgram <- function(X,plot=FALSE){
 	
 	n <- length(X)
 	lambda <- (-floor((n-1)/2):floor(n/2))/n*2*pi
